@@ -1,0 +1,28 @@
+services:
+  dip-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TORCH_INDEX_URL: ${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
+    container_name: dip-inverse-problems
+    ports:
+      - "${DIP_PORT:-8501}:8501"
+    volumes:
+      - ./outputs:/app/outputs
+    environment:
+      - DIP_DEVICE=${DIP_DEVICE:-auto}
+    restart: unless-stopped
+
+  dip-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TORCH_INDEX_URL: ${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
+    profiles: ["cli"]
+    volumes:
+      - ./outputs:/app/outputs
+    environment:
+      - DIP_DEVICE=${DIP_DEVICE:-auto}
+    entrypoint: ["python", "scripts/run_experiment.py"]
